@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1>ОФОРМЛЕНИЕ ЗАКАЗА</h1>
+
+<form method="post">
+    {% csrf_token %}
+    {{form.as_p}}
+    <button class="button_send_order" type="submit">РАССЧИТАТЬ</button>
+
+
+
+</form>
+{% if total_price > 0 %}
+<h3>СУММА ЗАКАЗА:{{total_price}} РУБ</h3>
+{% endif %}
+
+
+
+
+
+
+
+</body>
+</html>

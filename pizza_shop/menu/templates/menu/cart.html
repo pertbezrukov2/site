@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Корзина</h1>
+<ul>
+    {%for pizza, item in pizzas_in_cart %}
+    <li>
+        <h3>{{pizza.name}}</h3>
+        <p>Количество продуктов:{{item.quantity}}</p>
+        <p>Цена:{{item.quantity}}x{{pizza.price}}</p>
+        <p>{{item.total_price}}</p>
+
+
+    </li>
+    {%endfor%}
+
+</ul>
+
+<h3>ОБЩАЯ СУММА
+
+
+{{total_price}}
+
+</h3>
+<a href="/">ОФОРМИТЬ ЗАКАЗ</a>
+
+</body>
+</html>
