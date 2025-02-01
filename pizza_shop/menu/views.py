@@ -31,23 +31,42 @@ def add_to_cart(request,pizza_id):
     pizza = get_object_or_404(Pizza, id=pizza_id)
     cart, created = Cart.objects.get_or_create(id=request.session.get('cart_id'))
 
-    if created:
+    if created or not request.session.get('cart_id'):
+
         request.session['cart_id'] = cart.id
 
-    cart_item, created = CartItem.objects.get_or_create(cart=cart, pizza=pizza)
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, pizza=pizza,defaults = {'quantity':1})
 
     if not created:
         cart_item.quantity += 1
         cart_item.save()
+    return redirect('cart')
 
 
 def cart_view(request):
+    cart_id = request.session.get('cart_id')
+    if not cart_id:
+        return render(request, 'menu/cart.html', {'pizzas_in_cart': [], 'total_price': 0})
+    cart = get_object_or_404(Cart,id=cart_id)
+    cart_items = CartItem.objects.filter(cart = cart)
+
+    total_price = sum(item.total_price for item in cart_items)
+    return render(request,'menu/cart.html',{'pizzas_in_cart':cart_items,'total_price': total_price})
+
+
+def remove_from_cart(request,pizza_id):
+
     cart = get_cart(request)
-    pizzas_in_cart = [(Pizza.objects.get(id=int(pid)),item) for pid,item in cart.items()]
-    total_price = sum([float(item['price']) * item['quantity'] for item in cart.values()])
-    return render(request,'menu/cart.html',{'pizzas_in_cart':pizzas_in_cart,'total_price': total_price})
+    print(cart)
+    cart_item = CartItem.objects.filter(cart=cart,pizza_id=pizza_id).first()
+    if cart_item:
+        if cart_item.quantity>1:
+            cart_item.quantity-=1
+            cart_item.save()
+        else:
+            cart_item.delete()
 
-
+    return redirect('cart')
 
 
 
