@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from .models import Pizza,CartItem,Cart
+from .models import Pizza,CartItem,Cart,Order
 from .forms import OrderForm
 # Create your views here.
 
@@ -24,8 +24,14 @@ def order_view(request):
 
 
 def get_cart(request):
-    cart = request.session.get('cart',{})
-    return cart
+    cart_id = request.session.get('cart_id')
+    if cart_id:
+        return get_object_or_404(Cart, id=cart_id)
+    else:
+        cart = Cart.objects.create()
+        request.session['cart_id'] = cart.id
+        return cart
+
 
 def add_to_cart(request,pizza_id):
     pizza = get_object_or_404(Pizza, id=pizza_id)
@@ -68,6 +74,12 @@ def remove_from_cart(request,pizza_id):
 
     return redirect('cart')
 
+def payment(request, pizza_id):
+    order = get_object_or_404(Order)
+    if request.method == 'POST':
+        order.is_payed = True
+        order.save()
+    return redirect('menu')
 
 
 

@@ -13,15 +13,7 @@ class Pizza(models.Model):
         return self.name
 
 
-class Order(models.Model):
-    customer_name = models.CharField(max_length=25)
-    contact = models.CharField(max_length=100)
-    address = models.TextField(blank=True,null=True)
-    pizzas = models.ManyToManyField(Pizza)
-    created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return f"Заказ от{self.customer_name}-{self.created_at}"
 
 
 
@@ -46,3 +38,13 @@ class CartItem(models.Model):
 
 
 
+class Order(models.Model):
+    customer_name = models.CharField(max_length=25)
+    contact = models.CharField(max_length=100)
+    address = models.TextField(blank=True,null=True)
+    cart = models.OneToOneField(Cart,on_delete = models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_payed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Заказ от{self.customer_name}-{self.created_at}"
