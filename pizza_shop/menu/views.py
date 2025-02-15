@@ -1,26 +1,12 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from .models import Pizza,CartItem,Cart,Order
-from .forms import OrderForm
+from .models import Pizza,CartItem,Cart
+#from .forms import OrderForm
 # Create your views here.
 
 def menu_view(request):
     pizzas = Pizza.objects.all()
     return render(request,'menu/menu.html',{'pizzas':pizzas})
 
-def order_view(request):
-    total_price = 0
-    if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            pizzas = form.cleaned_data['pizzas']
-            total_price = int(sum(pizza.price for pizza in pizzas))
-            form.save()
-            # return redirect('menu')
-
-    else:
-        form = OrderForm()
-
-    return render(request,'menu/order.html',{'form':form,'total_price':total_price})
 
 
 def get_cart(request):
@@ -74,10 +60,23 @@ def remove_from_cart(request,pizza_id):
 
     return redirect('cart')
 
-def payment(request, order_id):
-    order = get_object_or_404(Order,id=order_id)
+def payment(request):
+    cart = get_cart(request)
+    cart_item = CartItem.objects.filter(cart=cart)
+    total_price = sum(item.total_price for item in cart_item)
     if request.method == 'POST':
-        order.is_payed = True
-        order.save()
+        customer = request.POST.get('customer')
+        contact = request.POST.get('contact')
+        address = request.POST.get('address')
+        is_payed = request.POST.get('is_payed')
+        cart.customer_name = customer
+        cart.contact = contact
+        cart.address = address
+        cart.is_payed = is_payed
+        cart.save()
+        cart.delete()
+        del request.session['cart_id']
+    #     order.is_payed = True
+    #     order.save()
         return redirect('menu')
-    return render(request,'menu/payment.html', {'order': order})
+    return render(request,'menu/payment.html', {'total_price': total_price})
