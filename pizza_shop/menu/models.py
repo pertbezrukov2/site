@@ -48,3 +48,11 @@ class Order(models.Model):
 
     def __str__(self):
         return f"Заказ от{self.customer_name}-{self.created_at}"
+class OrderItem(models.Model):
+    pizza = models.ForeignKey(Pizza,on_delete=models.CASCADE)
+    order = models.ForeignKey(Order,on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+
+    @property
+    def total_price(self):
+        return self.pizza.price * self.quantity

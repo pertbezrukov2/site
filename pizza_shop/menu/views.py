@@ -74,12 +74,10 @@ def remove_from_cart(request,pizza_id):
 
     return redirect('cart')
 
-def payment(request, pizza_id):
-    order = get_object_or_404(Order)
+def payment(request, order_id):
+    order = get_object_or_404(Order,id=order_id)
     if request.method == 'POST':
         order.is_payed = True
         order.save()
-    return redirect('menu')
-
-
-
+        return redirect('menu')
+    return render(request,'menu/payment.html', {'order': order})
